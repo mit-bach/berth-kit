@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "berth"
+version = "0.1.0"
+description = "Catalog for cmux workspaces, and the screen that files them. Capture every new workspace into a folder, then pause and play one berth at a time."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Dominik Bach" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pyte>=0.8.2"]
+
+[project.scripts]
+berth = "berth.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["berth*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

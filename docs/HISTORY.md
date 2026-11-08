@@ -1,0 +1,33 @@
+# History: what was built, and why
+
+Berth was built in October 2026 by Dominik with Claude Code agents, one long development session and its forks. This repository's own log starts at v3.0.0; the earlier history is summarized here and in `CHANGELOG.md`. Later changes are described in the package README's dated notes. Where this file and the code disagree, the code wins.
+
+## Before 2026-10-23
+
+1. **Catalog and screen (2026-10-05).** cmux workspaces filed in folders; pause (save the recipe, close) and play (reopen from the recipe); a curses screen.
+2. **Name sync (2026-10-15).** One name in Berth, the workspace, and the agent. Claude's generated `ai-title` is read; a generated title never replaces one a person chose.
+3. **State machine (2026-10-15).** About 30 places in four processes wrote row state directly and raced during cmux quits: workspaces open with parked rows, restored workspaces never relinked, duplicate rows. Now one module (`machine.py`) writes state by a transition table, one observer turns cmux observations into transitions, and an invariant check runs every tick (`berth check`).
+4. **Subfolders and computed colors (2026-10-16).** Folders nest; colors come from the tree, not from people.
+5. **Recency order (2026-10-17).** Newest use first, folders interleaved with sessions; the sidebar follows the tree.
+6. **Claude session truth and forks (2026-10-18/19).** Forking had broken Berth (two rows for one conversation, rows opening in the wrong directory) because hook session ids go stale. Berth now follows Claude's own `~/.claude/sessions` records. `F`, `berth fork`, and the MCP's fork are one code path; agents never type `/fork`. No background agents: a headless job is moved into a pane.
+7. **Restarts restore everything (2026-10-21).** After a cmux restart, the idle panes cmux restored are closed and every session that was open is woken.
+8. **The lid-close incident (2026-10-22).** Berth inferred a restart from a new socket file and from cmux not answering; cmux does both on every wake from sleep. Every pane closed on every wake, seven times that day. Since then only a different cmux process is a restart, and a pane running an agent is never closed unless a person asked.
+9. **Skills and MCP parity (2026-10-23).** Grok forks like Claude; Berth picks every fork's session id up front; the MCP gained folder moves, folder park, delete, restore, check; the two cmux skills share one Berth block, enforced by a test. Three drift bugs fixed: a headless `claude -p`/`grok -p` run from a pane hijacking that pane's row; a stale workspace list relinking a just-paused row; Grok losing its flags because cmux's hook keeps arguments only up to the first session id.
+10. **Cycle (2026-10-23):** off and on again, same conversation. **Color rewrite (2026-10-23):** every folder an equal share of the hue wheel, colors optimized apart in OKLab (the closest pair went from 0.03 to 0.18).
+
+## 2026-10-27 to 2026-10-29
+
+11. **Prompt files as one paste.** A 4.5 KB prompt typed into a busy pane lost text; prompt files now go in through `cmux paste`.
+12. **The screen's text boxes** became a real line editor (readline keys, selection, clipboard, mouse, bracketed paste).
+13. **Sleeping, trash, pins.** `sleeping` (closed for now; `S`, `Z` sleep all, `W` wake all) separate from parked (put away). A 30-day trash for every deletion. Pins: first in the sidebar, kept in step with cmux's own pin.
+14. **The Berth MCP (`berth mcp`)**: ten tools over the catalog with scopes (your folder, up, down, branches, query) and dry runs for every bulk action; the `berth` skill teaches it. The cmux skills use it for every session action and cmux-mcp only for the pane.
+15. **Busy from the pane, drafts, safe closes.** Busy is read from each pane every three seconds (a turn, background shells and agents, an open question, a running command); every close reads it again and refuses a busy session unless confirmed; unsent drafts are saved and pasted back; Claude reopens in the permission mode it had.
+16. **Queued closes.** A session can ask to be cycled or slept (`"me"`); the watcher does it when its turn ends. `when: idle` queues any session.
+17. **Berth's own cmux sidebar and notifications**: one word per session from the same look at the pane, folder colors, Urgent first; notifications reworded.
+18. **Working directory.** A session's directory can be changed (`update {"cwd"}`), separate from its Berth folder; a Claude fork can start in another directory.
+19. **Urgent.** An agent can flag that the operator is needed, with why; it shows first and red until a prompt reaches the session.
+20. **One home.** Berth's code moved into Dominik's FORGE folder; this kit was built from that working tree and from the repo that holds cmux-mcp and the skills.
+21. **Look before sending a prompt (2026-10-30).** Agents typed prompts into other sessions without looking: into a running turn, which stops a Grok's turn and can land mid-task in Claude's, and into open questions, where typed text picks an answer. The Berth MCP's `send` reads the pane first and sends only to a ready prompt; otherwise it returns what the session is doing, and the caller chooses to wait (`when idle`, delivered by the watcher), queue (`now`, with a line asking Claude to finish first), or interrupt (Esc on a running turn). cmux's own paste refusal decides whether someone is typing, because Claude's dim suggestion reads like typing on screen. cmux-mcp's `input` refuses a prompt into a session that is not ready unless `force`.
+22. **Compaction done by Berth (2026-10-30).** A pasted `/compact <note>` is a plain message to Claude: one fork read its compaction note as its job and built the thing. `berth/compact.py` types `/compact `, pastes the note behind it, and counts it done only when Claude's transcript has a new `compact_boundary`; a closed session or a new fork is compacted with `claude -p -r`, with no pane at all.
+23. **One Berth screen (2026-10-30).** A second screen, started in a workspace not named Berth, was filed as a shell, and either screen could run the other's actions, so a delete of the extra one was refused as "the caller". Now the screen holds an exclusive lock and a second `berth` goes to the open one; each action runs as the screen that asked for it; two screens is a reported violation; and every protected delete has an override (`!`, or `force` and `confirm`).
+24. **Permission mode from settings (2026-10-31).** `create` passed `--dangerously-skip-permissions`, so every agent-made session ran in bypass whatever the operator's default. Now it passes no permission flag; a new session takes `permissions.defaultMode`.

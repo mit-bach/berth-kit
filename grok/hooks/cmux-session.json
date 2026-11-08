@@ -1,0 +1,70 @@
+{
+  "hooks" : {
+    "Notification" : [
+      {
+        "hooks" : [
+          {
+            "command" : ": cmux-grok-hook-v2; :; printenv CMUX_GROK_HOOKS_DISABLED | grep -qx 1 && { :; { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; } || { if [ -n \"${CMUX_SOCKET_PATH:-}\" ] && [ -S \"$CMUX_SOCKET_PATH\" ] && [ -f \"${CMUX_BUNDLED_CLI_PATH:-}\" ] && [ -x \"$CMUX_BUNDLED_CLI_PATH\" ] && CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 \"$CMUX_BUNDLED_CLI_PATH\" --socket \"$CMUX_SOCKET_PATH\" hooks enqueue grok notification; then :; elif [ -x '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' ]; then CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks enqueue grok notification; elif command -v cmux >\/dev\/null 2>&1; then CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 cmux --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks enqueue grok notification; else { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; fi; cmux_hook_status=$?; :; if [ \"$cmux_hook_status\" -ne 0 ]; then { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; fi; exit 0; }",
+            "timeout" : 5,
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "PreToolUse" : [
+      {
+        "hooks" : [
+          {
+            "command" : ": cmux-grok-hook-v2; :; printenv CMUX_GROK_HOOKS_DISABLED | grep -qx 1 && { :; { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; } || { if [ -n \"${CMUX_SOCKET_PATH:-}\" ] && [ -S \"$CMUX_SOCKET_PATH\" ] && [ -f \"${CMUX_BUNDLED_CLI_PATH:-}\" ] && [ -x \"$CMUX_BUNDLED_CLI_PATH\" ] && \"$CMUX_BUNDLED_CLI_PATH\" --socket \"$CMUX_SOCKET_PATH\" hooks feed --source grok --event PreToolUse; then :; elif [ -x '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' ]; then '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks feed --source grok --event PreToolUse; elif command -v cmux >\/dev\/null 2>&1; then cmux --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks feed --source grok --event PreToolUse; else { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; fi; cmux_hook_status=$?; :; exit $cmux_hook_status; }",
+            "timeout" : 120,
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "SessionEnd" : [
+      {
+        "hooks" : [
+          {
+            "command" : ": cmux-grok-hook-v2; :; printenv CMUX_GROK_HOOKS_DISABLED | grep -qx 1 && { :; { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; } || { if [ -n \"${CMUX_SOCKET_PATH:-}\" ] && [ -S \"$CMUX_SOCKET_PATH\" ] && [ -f \"${CMUX_BUNDLED_CLI_PATH:-}\" ] && [ -x \"$CMUX_BUNDLED_CLI_PATH\" ] && CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 \"$CMUX_BUNDLED_CLI_PATH\" --socket \"$CMUX_SOCKET_PATH\" hooks enqueue grok session-end; then :; elif [ -x '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' ]; then CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks enqueue grok session-end; elif command -v cmux >\/dev\/null 2>&1; then CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 cmux --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks enqueue grok session-end; else { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; fi; cmux_hook_status=$?; :; if [ \"$cmux_hook_status\" -ne 0 ]; then { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; fi; exit 0; }",
+            "timeout" : 5,
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "SessionStart" : [
+      {
+        "hooks" : [
+          {
+            "command" : ": cmux-grok-hook-v2; :; printenv CMUX_GROK_HOOKS_DISABLED | grep -qx 1 && { :; { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; } || { if [ -n \"${CMUX_SOCKET_PATH:-}\" ] && [ -S \"$CMUX_SOCKET_PATH\" ] && [ -f \"${CMUX_BUNDLED_CLI_PATH:-}\" ] && [ -x \"$CMUX_BUNDLED_CLI_PATH\" ] && CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 \"$CMUX_BUNDLED_CLI_PATH\" --socket \"$CMUX_SOCKET_PATH\" hooks enqueue grok session-start; then :; elif [ -x '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' ]; then CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks enqueue grok session-start; elif command -v cmux >\/dev\/null 2>&1; then CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 cmux --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks enqueue grok session-start; else { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; fi; cmux_hook_status=$?; :; if [ \"$cmux_hook_status\" -ne 0 ]; then { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; fi; exit 0; }",
+            "timeout" : 5,
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "Stop" : [
+      {
+        "hooks" : [
+          {
+            "command" : ": cmux-grok-hook-v2; :; printenv CMUX_GROK_HOOKS_DISABLED | grep -qx 1 && { :; { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; } || { if [ -n \"${CMUX_SOCKET_PATH:-}\" ] && [ -S \"$CMUX_SOCKET_PATH\" ] && [ -f \"${CMUX_BUNDLED_CLI_PATH:-}\" ] && [ -x \"$CMUX_BUNDLED_CLI_PATH\" ] && CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 \"$CMUX_BUNDLED_CLI_PATH\" --socket \"$CMUX_SOCKET_PATH\" hooks enqueue grok stop; then :; elif [ -x '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' ]; then CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks enqueue grok stop; elif command -v cmux >\/dev\/null 2>&1; then CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 cmux --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks enqueue grok stop; else { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; fi; cmux_hook_status=$?; :; if [ \"$cmux_hook_status\" -ne 0 ]; then { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; fi; exit 0; }",
+            "timeout" : 5,
+            "type" : "command"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit" : [
+      {
+        "hooks" : [
+          {
+            "command" : ": cmux-grok-hook-v2; :; printenv CMUX_GROK_HOOKS_DISABLED | grep -qx 1 && { :; { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; } || { if [ -n \"${CMUX_SOCKET_PATH:-}\" ] && [ -S \"$CMUX_SOCKET_PATH\" ] && [ -f \"${CMUX_BUNDLED_CLI_PATH:-}\" ] && [ -x \"$CMUX_BUNDLED_CLI_PATH\" ] && CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 \"$CMUX_BUNDLED_CLI_PATH\" --socket \"$CMUX_SOCKET_PATH\" hooks enqueue grok prompt-submit; then :; elif [ -x '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' ]; then CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 '\/Applications\/cmux.app\/Contents\/Resources\/bin\/cmux' --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks enqueue grok prompt-submit; elif command -v cmux >\/dev\/null 2>&1; then CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 cmux --socket '\/Users\/olduser\/.local\/state\/cmux\/cmux.sock' hooks enqueue grok prompt-submit; else { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; fi; cmux_hook_status=$?; :; if [ \"$cmux_hook_status\" -ne 0 ]; then { cat >\/dev\/null 2>\/dev\/null || true; echo '{}'; }; fi; exit 0; }",
+            "timeout" : 5,
+            "type" : "command"
+          }
+        ]
+      }
+    ]
+  }
+}

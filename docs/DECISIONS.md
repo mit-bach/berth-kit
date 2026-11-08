@@ -1,0 +1,31 @@
+# Day-one decisions
+
+Each of these is built into the kit the way Dominik has it. Go through them with your operator before installing (the terminal track's stage 0). Recommend; let them decide; write the answers to `~/.berth-onboarding/DECISIONS.md`; apply them at the stage named (the terminal track's stages; the cmux track applies them in one pass).
+
+| # | Decision | Dominik's choice | Options | Where it lives | Applied in |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Where the kit lives | his own repos | any permanent directory; a clone of the repository, wherever they cloned it. Not Downloads, Desktop, Documents, iCloud, or `/tmp`: everything installed runs from here, and macOS guards those from background programs | the kit's path; `install.sh` refuses temporary places without `--here` | 0 |
+| 2 | Permission mode for sessions agents start | auto: his `permissions.defaultMode` in `~/.claude/settings.json` | manual (ask every time), `acceptEdits`, `auto`, `plan`, `dontAsk`, `bypassPermissions` | their `~/.claude/settings.json` → `permissions.defaultMode`. Berth's `create` passes no permission flag, so a new session starts in their default. Effort `xhigh` stays in `spawn_command` (`packages/berth/berth/mcp.py`). The cmux-claude skill's **Spawn** and **Dialog** (outside its `berth-core` block) | 3 |
+| 3 | Effort for sessions agents start | `--effort xhigh` | lower, or none (Claude's default) | the same line in `spawn_command` | 3 |
+| 3a | Berth's session standard: every Claude session in auto mode at effort xhigh | on: the watcher reopens a session it finds in bypass in auto, and types `/effort xhigh` into one below it, only when the session is idle, has no draft, and is not the one on screen, at most once an hour | off: `berth standard --correct off`, and Berth only lists sessions off the standard in `berth check`. A session in plan or accept-edits mode is never corrected, either way. If they want bypass or a lower effort, it must be off | `berth standard`; Berth's README, "The session standard" | 2 |
+| 4 | Model for sessions agents start | Claude's default from `~/.claude/settings.json`; never Fable unless named in the chat; Opus when the default is unset or Fable | their own rule | `claude_model` in `mcp.py`; the **Model** sections of the `berth` and `cmux-claude` skills | 3 |
+| 5 | Their own sessions' permission mode | their `~/.claude/settings.json` | unchanged by this kit | `permissions.defaultMode` | (none) |
+| 6 | Berth's sidebar in cmux | on (one honest word per session, folder colors, quieter notifications) | keep cmux's own sidebar: `install.sh berth --no-sidebar`, or later `berth sidebar uninstall` | `~/.config/cmux/cmux.json`, `~/.config/cmux/sidebars/berth.js` | 2 |
+| 7 | ⌘⇧B opens the Berth screen | yes; cmux's own ⌘⇧B (Jump to Last Prompt) is unbound and stays in the command palette | another shortcut: edit `actions.berth.shortcut` in `cmux.json` | `cmux.json` → `actions.berth`, `shortcuts.bindings.jumpToLastPrompt` | 2 |
+| 8a | cmux socket access (who may control cmux) | `automation`: any process of his user may connect | cmux's default, `cmuxOnly`, answers only processes started inside cmux terminals, so Berth's watcher (a LaunchAgent) is locked out and nothing is cataloged, parked, or restored; `password` needs a password Berth cannot pass; `allowAll` is wider still. Berth needs `automation`. Say plainly what it means: any program running as them can drive cmux | `cmux.json` → `automation.socketControlMode` | 1 |
+| 8 | cmux resumes agents on its own after a restart | off (Berth resumes, from Claude's own records) | must stay off for Berth's restart model | `cmux.json` → `terminal.autoResumeAgentSessions` | 1 |
+| 8b | Where links open | the system's default browser (his is Dia), for links clicked in a terminal, `open <url>` run in one, and the sidebar's pull request and port links | cmux's built-in browser (cmux's own default): a browser pane inside cmux. Teammates new to cmux found links "opening in the terminal itself" confusing | `cmux.json` → `browser.openTerminalLinksInCmuxBrowser`, `browser.interceptTerminalOpenCommandInCmuxBrowser`, `sidebar.openPullRequestLinksInCmuxBrowser`, `sidebar.openPortLinksInCmuxBrowser` (all `false` for the system browser); `tools/install.sh cmux --cmux-browser` keeps cmux's | 1 |
+| 9 | The watcher runs at login | yes, a LaunchAgent | it is what keeps the catalog true; without it Berth goes stale | `~/Library/LaunchAgents/com.bach.berth.watch.plist` | 2 |
+| 10 | Background agents | none: a headless Claude job is moved into a pane when opened | (Berth enforces this) | `berth/claude_sync.py` | (none) |
+| 11 | Which agents may raise Urgent, and for what | only those whose instructions say so | their rule | their `CLAUDE.md` | 3, 4 |
+| 12 | Folder layout | by area, then project | their own | the catalog (`folder` tool, `berth mkdir`) | 2, 4 |
+| 13 | Grok Build | yes, with `--always-approve --no-subagents --reasoning-effort xhigh` | skip, or their own flags | `install.sh grok`; Grok's spawn command in `spawn_command` | 4 |
+| 14 | House rules for every agent | in his CLAUDE.md files | a short Berth section in `~/.claude/CLAUDE.md` | their `CLAUDE.md` | 4 |
+
+Notes:
+
+- A wake or cycle reopens a Claude session in the permission mode its status strip showed when it closed (`berth/state.py`). **Manual mode shows nothing on the strip**, so a session closed in manual mode reopens with its start flags. Berth starts sessions with no permission flag, so that is their `settings.json` default: with a manual default, manual is kept; a session switched to manual by hand comes back in the default. Sessions moved in by `tools/migrate.py` also start with no permission flag (their default) plus any `flags` in the plan, and reopen the same way.
+- The watcher's LaunchAgent label is `com.bach.berth.watch` on every Mac: Berth's code uses that name, so keep it.
+- The sidebar (6) and the shortcut (7) are recommended, not required: `tools/doctor.py` shows them as `note`, not `FIX`, so declining them still passes.
+- `mcp.py` is Berth's code. After editing it, run Berth's tests and restart the MCP's users (cycle them); see `TROUBLESHOOTING.md`.
+- Both cmux skills must keep their `berth-core` block identical (`packages/cmux-mcp/tests/test_skills.py`). Put agent-specific edits outside it.
