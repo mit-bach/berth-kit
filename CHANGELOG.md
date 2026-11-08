@@ -2,6 +2,10 @@
 
 Newest first. `docs/HISTORY.md` tells how Berth itself was built.
 
+## v3.1.1 (2026-11-07)
+
+- The README lists every repository the kit comes from or uses ("Repositories this uses"), and whether you install from it or only read it.
+
 ## v3.1.0 (2026-11-07)
 
 - **Links open in your normal browser**, not cmux's built-in one: links clicked in a terminal, `open <url>`, and the sidebar's pull request and port links. A day-one decision (`docs/DECISIONS.md`, 8b); `tools/install.sh cmux --cmux-browser` keeps cmux's browser.

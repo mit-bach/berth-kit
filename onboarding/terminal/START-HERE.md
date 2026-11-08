@@ -6,7 +6,7 @@ You are a Claude Code agent. Your operator already uses Claude Code. Today they 
 
 Your job is to move your operator from tabs to that setup **over several chats**, at their pace, and to make it theirs, not a copy of Dominik's. Read this file to the end before you act.
 
-Kit v3.1.0, built 2026-11-07 (Berth as of 2026-11-07). Tested on macOS 27, Python 3.12, cmux 0.65.2 (0.65 or newer is required), Claude Code 2.1.31x.
+Kit v3.1.1, built 2026-11-07 (Berth as of 2026-11-07). Tested on macOS 27, Python 3.12, cmux 0.65.2 (0.65 or newer is required), Claude Code 2.1.31x.
 
 ## 1. What your operator gets
 

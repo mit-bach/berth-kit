@@ -2,7 +2,7 @@
 
 Dominik's agent setup, in one repository. **Berth** is a catalog of every agent session on a Mac: folders, sleep and wake, restart, fork, a 30-day trash, and the Berth MCP server, so agents can start and run other agents. **cmux-mcp** lets an agent look at and type into another session's pane. The **berth**, **cmux-claude** and **cmux-grok** skills teach agents to use both. There's an installer, a checker, and onboarding for three kinds of people. Your agent does the work: you send it one prompt from below and answer its questions.
 
-Version 3.1.0. What changed: `CHANGELOG.md`. macOS only.
+Version 3.1.1. What changed: `CHANGELOG.md`. macOS only.
 
 ## Who sends which prompt
 
@@ -126,6 +126,19 @@ Read `TIPS.md`. It's the one document written for you rather than your agent: th
 | `skills/cmux-claude/`, `skills/cmux-grok/` | The skills that start and drive Claude and Grok sessions. |
 | `grok/hooks/` | A fallback copy of Grok's cmux hook. |
 | `TIPS.md`, `CHANGELOG.md`, `CONTRIBUTING.md` | For people. |
+
+## Repositories this uses
+
+| Repository | What it's for | Install from it, or read only |
+| --- | --- | --- |
+| [uni-bach/berth-kit](https://github.com/uni-bach/berth-kit) | This kit: Berth, cmux-mcp, the skills, the installer, and the onboarding | Install: everything runs from your clone |
+| [cmux](https://cmux.com) | The terminal app Berth runs on. Not ours | Install: you download the app from cmux.com |
+| [astral-sh/uv](https://github.com/astral-sh/uv) | Makes Berth's Python environment, and fetches Python 3.12 for it | Install, only if you have neither uv nor Python 3.12: Homebrew (`brew install uv`) or astral.sh's installer |
+| [pytest-dev/pytest](https://github.com/pytest-dev/pytest), [selectel/pyte](https://github.com/selectel/pyte) | Berth's tests (pyte reads the screen back in them) | Installed for you from PyPI into Berth's environment |
+| [pypa/setuptools](https://github.com/pypa/setuptools) | Builds Berth's package while it installs | Installed for you from PyPI during the install |
+| [anthropics/claude-code](https://github.com/anthropics/claude-code) | Claude Code, the agent the onboarding runs in. Not part of the kit | Yours already; read only here |
+
+Berth itself needs nothing beyond Python's standard library. Grok Build is optional: the installer's `grok` stage configures it if you have it, and installs nothing for it.
 
 ## Versions
 
