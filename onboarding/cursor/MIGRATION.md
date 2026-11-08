@@ -1,6 +1,6 @@
 # Migration map: cmux to a setup without it
 
-The target: Claude sessions in Cursor, in its terminals or the Claude Code extension's panels (`CURSOR-SETUP.md`, Step 0, says how to tell which). Nothing here has been ported or tried there. This file lists, module by module, what talks to cmux and what does not, so you can choose a backend and see what it must provide. Paths are under `packages/`. Current as of kit v3.1.1 (2026-11-07).
+The target: Claude sessions in Cursor, in its terminals or the Claude Code extension's panels (`CURSOR-SETUP.md`, Step 0, says how to tell which). Nothing here has been ported or tried there. This file lists, module by module, what talks to cmux and what does not, so you can choose a backend and see what it must provide. Paths are under `packages/`. Current as of kit v3.1.2 (2026-11-07).
 
 ## The seam
 

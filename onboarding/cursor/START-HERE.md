@@ -4,7 +4,7 @@ Paths below are relative to the kit: the repository's top folder.
 
 You are an agent picking up Berth, the system Dominik built to run twenty to thirty agent sessions at once. Read this file first, all of it. It says why you have this, what is in the kit, what to read next, how to run the tests, what must not break, and how Berth maps onto a setup where Claude runs in Cursor instead of cmux.
 
-Kit v3.1.1, built 2026-11-07 (Berth as of 2026-11-07). Tested on macOS 27, Python 3.12, cmux 0.65.2, Claude Code 2.1.31x, Grok Build 1.0.67. Your operator is not Dominik, and this is not a one-to-one install. Expect to adapt, not copy.
+Kit v3.1.2, built 2026-11-07 (Berth as of 2026-11-07). Tested on macOS 27, Python 3.12, cmux 0.65.2, Claude Code 2.1.31x, Grok Build 1.0.67. Your operator is not Dominik, and this is not a one-to-one install. Expect to adapt, not copy.
 
 ## 0. Why you have this
 

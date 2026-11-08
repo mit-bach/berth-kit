@@ -2,6 +2,10 @@
 
 Newest first. `docs/HISTORY.md` tells how Berth itself was built.
 
+## v3.1.2 (2026-11-07)
+
+- Fixed the kit's own link in "Repositories this uses", which pointed at a GitHub account that doesn't exist.
+
 ## v3.1.1 (2026-11-07)
 
 - The README lists every repository the kit comes from or uses ("Repositories this uses"), and whether you install from it or only read it.

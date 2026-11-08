@@ -4,7 +4,7 @@ Paths below are relative to the kit: the repository's top folder.
 
 You are an agent, Claude Code or Grok Build, helping your operator install and start using Berth, the system Dominik built to run many agent sessions at once in cmux. Your operator is new to this way of working: explain every step in plain words before you take it, and show every dry run. Read this file first, all of it.
 
-Kit v3.1.1, built 2026-11-07 (Berth as of 2026-11-07). Tested on macOS 27, Python 3.12, cmux 0.65.2 (0.65 or newer is required), Claude Code 2.1.31x, Grok Build 1.0.67. Your operator's Mac starts empty: no catalog, no sessions, none of Dominik's state.
+Kit v3.1.2, built 2026-11-07 (Berth as of 2026-11-07). Tested on macOS 27, Python 3.12, cmux 0.65.2 (0.65 or newer is required), Claude Code 2.1.31x, Grok Build 1.0.67. Your operator's Mac starts empty: no catalog, no sessions, none of Dominik's state.
 
 ## 0. Why Berth
 
