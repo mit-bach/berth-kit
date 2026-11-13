@@ -158,31 +158,43 @@ def _move_pane(db: Catalog, row, workspace: Workspace, conv: claude.Process) -> 
             folder = row["folder_id"]
             machine.transition(db, row["id"], "vanished", reason="replaced", log_kind="workspace_vanished",
                                detail={"via": "claude_session", "to_session": conv.session_id})
+            from berth.configdir import of_process
+
             fields = _row(db, title=row["title"], folder=folder, cwd=cwd, session_id=conv.session_id, argv=argv,
-                          state="live", workspace_id=workspace.id, protect=row["protect"])
+                          state="live", workspace_id=workspace.id, protect=row["protect"],
+                          config_dir=of_process(conv.pid))
             machine.insert(db, fields, event="adopt", log_kind="adopt",
                            detail={"via": "claude_session", "workspace_id": workspace.id, "from": row["id"]})
             return {"berth_id": fields["id"], "action": "adopted", "session_id": conv.session_id}
         folder = row["folder_id"]
         if folder == db.ensure_inbox():
             folder = family_folder(db, info.lineage if info else None, exclude=row["id"]) or folder
+        from berth.configdir import of_process
+
+        attachments = json.loads(row["attachments"] or "{}") if row["attachments"] else {}
+        found = of_process(conv.pid)
+        if found and not attachments.get("config_dir"):
+            attachments["config_dir"] = found  # the account folder it really runs on
         db.update_berth(
             row["id"], kind="other-agent", agent_name="claude", agent_session_id=conv.session_id,
             cwd=cwd, recipe_argv=json.dumps(argv), recipe_display=" ".join(argv), folder_id=folder, note="",
+            attachments=json.dumps(attachments, sort_keys=True),
         )
         db.insert_event(row["id"], "promote", {"via": "claude_session", "session_id": conv.session_id,
                                                "was": row["agent_session_id"]})
     return {"berth_id": row["id"], "action": "corrected", "session_id": conv.session_id}
 
 
-def _row(db: Catalog, *, title, folder, cwd, session_id, argv, state, workspace_id=None, protect=0) -> dict:
+def _row(db: Catalog, *, title, folder, cwd, session_id, argv, state, workspace_id=None, protect=0,
+         config_dir: str | None = None) -> dict:
     stamp = utc_now()
     return {
         "id": str(uuid.uuid4()), "folder_id": folder, "title": title, "kind": "other-agent", "state": state,
         "protect": protect, "cwd": cwd, "note": "", "recipe_argv": json.dumps(argv),
         "recipe_display": " ".join(argv), "agent_name": "claude", "agent_session_id": session_id,
         "agent_version": None, "cmux_workspace_id": workspace_id, "cmux_surface_id": None, "cmux_pid": None,
-        "attachments": "{}", "excerpt": "", "excerpt_at": None, "created_at": stamp, "updated_at": stamp,
+        "attachments": json.dumps({"config_dir": config_dir}) if config_dir else "{}", "excerpt": "", "excerpt_at": None,
+        "created_at": stamp, "updated_at": stamp,
         "parked_at": None if state == "live" else stamp, "played_at": stamp if state == "live" else None,
     }
 

@@ -2,6 +2,12 @@
 
 Newest first. `docs/HISTORY.md` tells how Berth itself was built.
 
+## v3.2.0 (2026-11-13)
+
+- **Several Claude accounts on one Mac, ready to use.** Berth keeps each Claude session on its account's config folder (`config_dir`): it opens, wakes, forks, restarts and compacts it with `CLAUDE_CONFIG_DIR` set, `create {config_dir}` starts one on an account, and `berth config-dir <id> <folder> --cycle` moves one once it's idle. Its account files now default to `~/.config/claude-accounts/` (`config.json`, `state.json`, `usage.json`); `BERTH_ACCOUNTS_CONFIG` and `BERTH_ACCOUNTS_DATA` still point elsewhere. How it works: `packages/berth/docs/ACCOUNTS-AND-SIDEBAR.md`.
+- When Berth files or follows a session, it records the account folder its Claude really runs on, so a reopen keeps the account.
+- An idle close also waits while the session's urgent or follow-up flag is up, and gives up at its deadline.
+
 ## v3.1.2 (2026-11-07)
 
 - Fixed the kit's own link in "Repositories this uses", which pointed at a GitHub account that doesn't exist.

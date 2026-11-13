@@ -2,7 +2,7 @@
 
 Dominik's agent setup, in one repository. **Berth** is a catalog of every agent session on a Mac: folders, sleep and wake, restart, fork, a 30-day trash, and the Berth MCP server, so agents can start and run other agents. **cmux-mcp** lets an agent look at and type into another session's pane. The **berth**, **cmux-claude** and **cmux-grok** skills teach agents to use both. There's an installer, a checker, and onboarding for three kinds of people. Your agent does the work: you send it one prompt from below and answer its questions.
 
-Version 3.1.2. What changed: `CHANGELOG.md`. macOS only.
+Version 3.2.0. What changed: `CHANGELOG.md`. macOS only.
 
 ## Who sends which prompt
 
@@ -144,7 +144,7 @@ Berth itself needs nothing beyond Python's standard library. Grok Build is optio
 
 Every version is a git tag (`git tag`), and `CHANGELOG.md` says what each one changed. `git pull` brings the newest. Since everything installed runs from this folder, follow a pull with the Update prompt above.
 
-This version was tested on macOS 27, Python 3.12, cmux 0.65.2 (0.65 or newer is required), and Claude Code 2.1.31x. Tests: Berth 601 passed, 3 failed; cmux-mcp 55 passed.
+This version was tested on macOS 27, Python 3.12, cmux 0.65.2 (0.65 or newer is required), and Claude Code 2.1.31x. Tests: Berth 607 passed, 3 failed; cmux-mcp 55 passed.
 
 ## Contributing
 

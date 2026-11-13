@@ -154,3 +154,27 @@ def test_an_explicit_folder_or_default_wins_over_the_default_account(switcher, t
     from berth.mcp import spawn_command
 
     assert "CLAUDE_CONFIG_DIR" not in spawn_command("claude", "A job", model="opus", config_dir=None)
+
+
+def test_create_never_errors_once_the_session_exists_even_before_claudes_hook(catalog, switcher, tmp_path, monkeypatch):
+    """2026-11-10, UNI Orch: Claude's session hook came after the 3 s adopt wait, the row was still a shell, and the
+    folder step answered KIND_UNSAFE for a session that existed and had its prompt."""
+    from berth import configdir
+    from berth.mcp import Api
+    from tests.fakes import FakeCmux
+
+    (tmp_path / ".claude-homestead" / "settings.json").write_text("{}")
+    config = tmp_path / "accounts-config.json"
+    data = json.loads(config.read_text())
+    data["default_account"] = "homestead"
+    config.write_text(json.dumps(data))
+
+    def adopt(db, cmux, hooks, workspace_id, wait_s=0):
+        _insert(db, id="early", title="Early", kind="shell", agent_name=None, state="live", cmux_workspace_id=workspace_id)
+        return {"id": "early"}
+
+    monkeypatch.setattr("berth.adopt.adopt_appearing", adopt)
+    out = Api(catalog.path, cmux=FakeCmux(), caller_workspace=None)("create", {"title": "Early", "cwd": str(tmp_path),
+                                                                              "folder": "Inbox"})
+    assert out["id"] == "early" and "warnings" not in out and out["config_dir"] == switcher["homestead"]
+    assert configdir.of(catalog.require_berth("early")) == switcher["homestead"]

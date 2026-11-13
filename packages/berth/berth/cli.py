@@ -306,6 +306,10 @@ def build_parser() -> argparse.ArgumentParser:
     sleep_cmd = sub.add_parser("sleep", parents=[_common()], help="put a session (or --all live ones) to sleep; wake brings them back")
     sleep_cmd.add_argument("query", nargs="?", default="")
     sleep_cmd.add_argument("--all", action="store_true", help="every live session but the Berth screen")
+    cancel_cmd = sub.add_parser("cancel", parents=[_common()],
+                                help="take back the close queued for a session (a cycle, idle, sleep or park waiting "
+                                     "for it to be idle), as the MCP's control cancel does; nothing opens or closes")
+    cancel_cmd.add_argument("query")
     sub.add_parser("memory", parents=[_common()],
                    help="memory now: the Mac as Activity Monitor counts it, and each session's footprint by part "
                         "(Claude, MCP, hooks, shell), from the Performance Agent's definitions")
@@ -726,6 +730,13 @@ def _dispatch(args, db: Catalog):
         return whoami(db)
     if args.command == "memory":
         return memory_now(db, cmux)
+    if args.command == "cancel":
+        from berth import deferred
+
+        row = resolve_query(db, args.query)
+        taken = deferred.cancel(db, row["id"], requested_by=_requester(db, caller, "berth cancel"))
+        return {"id": row["id"], "title": row["title"],
+                "cancelled": {"action": taken["action"], "requested_by": taken["requested_by"]} if taken else None}
     if args.command == "tree":
         return tree(db, include_archived=args.all)
     if args.command == "adopt":

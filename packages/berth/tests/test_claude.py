@@ -306,3 +306,41 @@ def test_renaming_to_claudes_own_ai_title_still_names_the_session(catalog, monke
                         lambda cmux, ws, sid, title, force=False, **_: sent.append(title) or True)
     rename_berth(catalog, _cmux_with_pane(), "live", "Diagram MCP setup")
     assert sent == ["Diagram MCP setup"]  # Claude's ai-title is not a name: /rename is typed
+
+
+def test_an_sdk_claude_carrying_the_panes_environment_is_never_the_pane(catalog, monkeypatch):
+    """2026-11-08: Lee Course Builder's scripts ran Agent SDK Claudes (entrypoint sdk-cli) in its scratchpad, outside
+    its own Claude's tree; each, as the newest, parked the real conversation as "replaced": 21 rows in ten hours."""
+    write_claude_conversation("mine", CWD, root="family")
+    write_claude_conversation("sdk-run", "/tmp/scratchpad/run", root="other")
+    _claude_row(catalog, "pane-row", "mine")
+    write_claude_process(PANE_PID, "mine", CWD)
+    write_claude_process(JOB_PID, "sdk-run", "/tmp/scratchpad/run")
+    from berth import claude
+
+    path = claude.sessions_dir() / f"{JOB_PID}.json"
+    record = json.loads(path.read_text())
+    path.write_text(json.dumps({**record, "updatedAt": 2, "entrypoint": "sdk-cli"}))  # newer, and not nested
+    running = claude.processes()
+    assert running[JOB_PID].entrypoint == "sdk-cli"
+    assert claude.pane_conversation({PANE_PID, JOB_PID}, running).session_id == "mine"
+    cmux = _cmux_with_pane()
+    lines = cmux.top_processes().splitlines()
+    lines.append(f"0\t0\t1\tprocess\t{JOB_PID}\t1\tclaude")  # its parent is launchd: the old nesting rule missed it
+    cmux.top_processes = lambda: "\n".join(lines)
+    assert claude_sync.follow(catalog, cmux, list(cmux.workspaces.values())) == []
+    assert catalog.require_berth("pane-row")["agent_session_id"] == "mine"
+
+
+def test_an_adopted_claude_row_records_the_folder_its_claude_runs_on(monkeypatch):
+    """2026-11-08, the Accounts Agent: rows adopted from a HOMESTEAD pane said ~/.claude while it ran on homestead."""
+    from berth import configdir, proc
+
+    monkeypatch.setattr(proc, "environ_value", lambda pid, name: "/Users/owner/.claude-homestead" if pid == 42 else None)
+    assert configdir.of_process(42) == "/Users/owner/.claude-homestead"
+    assert configdir.of_process(43) is None and configdir.of_process(None) is None
+    monkeypatch.setattr(proc, "environ_value", lambda pid, name: str(configdir.default_root()))
+    assert configdir.of_process(42) is None  # ~/.claude is the default: nothing to record
+    row = claude_sync._row(None, title="t", folder="f", cwd="/x", session_id="s", argv=[], state="live",
+                           config_dir="/Users/owner/.claude-homestead")
+    assert json.loads(row["attachments"]) == {"config_dir": "/Users/owner/.claude-homestead"}

@@ -1,16 +1,15 @@
 """Which Claude account each session is on (2026-11-03, for the Accounts Agent).
 
 Settings Agent owns the accounts and their mapping; Berth only reads it, from
-the account switcher's own files (``~/FORGE/lab/2026-10/account-switching``):
+the account switcher's own files (any account switcher that writes these files):
 
-* ``config.json`` (``~/STUDIO/Agents/Accounts/Accounts-Agent/account-switch/``, the Account
-  Agent's unit since 2026-11-05; it was under ``Harness/Coding-Agents/Settings-Agent/``):
+* ``config.json`` (``~/.config/claude-accounts/``):
   ``folders``, the config folder of each account that has its own, ``order``,
   every account, and ``default_account``, the account a new Claude session
   starts on (2026-11-04: homestead). ``create`` with no ``config_dir`` records
   that account's folder on the new session, so a later change of the default
   never moves it. A session that never had a folder stays on ``~/.claude``.
-* ``state.json`` (``~/STUDIO/.data/account-switch/``): ``active``, the account
+* ``state.json`` (``~/.config/claude-accounts/``): ``active``, the account
   ``~/.claude`` is signed in to now, and ``last_switch_at``.
 * ``usage.json`` (same folder): each account's ``five_hour`` and ``seven_day``
   ``used_percentage``.
@@ -46,11 +45,11 @@ UNKNOWN_COLOR = "#8E8E93"
 
 def config_path() -> Path:
     return Path(os.environ.get("BERTH_ACCOUNTS_CONFIG")
-                or Path.home() / "STUDIO" / "Agents" / "Accounts" / "Accounts-Agent" / "account-switch" / "config.json")
+                or Path.home() / ".config" / "claude-accounts" / "config.json")
 
 
 def data_dir() -> Path:
-    return Path(os.environ.get("BERTH_ACCOUNTS_DATA") or Path.home() / "STUDIO" / ".data" / "account-switch")
+    return Path(os.environ.get("BERTH_ACCOUNTS_DATA") or Path.home() / ".config" / "claude-accounts")
 
 
 _cache: dict = {"key": None, "value": None}

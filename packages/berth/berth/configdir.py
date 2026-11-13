@@ -112,12 +112,16 @@ def child_env(folder: str | None, base: dict | None = None) -> dict | None:
     return env
 
 
-def set_config_dir(db, berth_id: str, path, *, by: str = "") -> dict:
-    """Run this Claude session on ``path`` from its next open or cycle. Returns the row."""
+def set_config_dir(db, berth_id: str, path, *, by: str = "", spawned_claude: bool = False) -> dict:
+    """Run this Claude session on ``path`` from its next open or cycle. Returns the row.
+
+    ``spawned_claude``: Berth itself just started it as a Claude (``create``), so the folder is recorded even while
+    the row is still filed as a shell because Claude's session hook has not come yet (2026-11-10, UNI Orch).
+    """
     from berth.timeutil import utc_now
 
     row = db.require_berth(berth_id)
-    if not is_claude(row):
+    if not spawned_claude and not is_claude(row):
         raise BerthError("KIND_UNSAFE", f"{row['title']}: config_dir is for Claude sessions", {"berth_id": berth_id})
     folder = check(path)
     data = _attachments(row)
@@ -130,3 +134,22 @@ def set_config_dir(db, berth_id: str, path, *, by: str = "") -> dict:
         db.update_berth(row["id"], attachments=json.dumps(data, sort_keys=True), updated_at=utc_now())
         db.insert_event(row["id"], "config_dir", {"was": was, "now": folder, "by": by})
     return dict(db.require_berth(row["id"]))
+
+
+def of_process(pid) -> str | None:
+    """The config folder a running Claude really uses, from its own ``CLAUDE_CONFIG_DIR``; None for ~/.claude or
+    when it can't be read. A row Berth adopts records it, so a reopen lands on the same account (2026-11-08, the
+    Accounts Agent: adopted HOMESTEAD rows said ~/.claude while their Claude ran on ~/.claude-homestead)."""
+    from berth.proc import environ_value
+
+    if not pid:
+        return None
+    value = environ_value(int(pid), "CLAUDE_CONFIG_DIR")
+    if not value:
+        return None
+    try:
+        if Path(value).expanduser().resolve() == default_root().resolve():
+            return None
+    except OSError:
+        return None
+    return str(Path(value).expanduser())

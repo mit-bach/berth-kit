@@ -36,6 +36,9 @@ class Process:
     name: str
     job_id: str | None
     updated_at: float
+    # cli: a terminal Claude, which a pane can show. sdk-cli: one the Claude Agent SDK started from a script, which
+    # inherits the pane's environment but is never what the pane shows (2026-11-08, Lee Course Builder).
+    entrypoint: str = "cli"
 
 
 def _alive(pid: int) -> bool:
@@ -76,6 +79,7 @@ def processes() -> dict[int, Process]:
             name=data.get("name") if isinstance(data.get("name"), str) else "",
             job_id=data.get("jobId") if isinstance(data.get("jobId"), str) else None,
             updated_at=float(data.get("updatedAt") or 0),
+            entrypoint=data.get("entrypoint") if isinstance(data.get("entrypoint"), str) else "cli",
         )
     return found
 
@@ -120,7 +124,11 @@ def pane_conversation(pids: set[int], running: dict[int, Process],
     ``claude -p`` checks run from Berth Developer parked its row as "replaced" and
     adopted the scratch conversation in its place, once per run).
     """
-    here = {pid: running[pid] for pid in pids if pid in running and running[pid].kind != "bg"}
+    # A background job, or a Claude the Agent SDK runs from a script (its entrypoint sdk-cli), is never the pane's
+    # conversation: 2026-11-08, Lee Course Builder's scripts ran SDK Claudes in its scratchpad that carried its
+    # pane's environment, and each one parked the real conversation as "replaced" (21 rows in ten hours).
+    here = {pid: running[pid] for pid in pids
+            if pid in running and running[pid].kind != "bg" and not running[pid].entrypoint.startswith("sdk")}
     if tree is not None and len(here) > 1:
         parent = {ref: key for key, children in tree.items() for kind, ref in children if kind == "process"}
 

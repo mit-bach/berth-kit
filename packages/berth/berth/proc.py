@@ -67,3 +67,34 @@ def command(pid) -> str:
 def forget() -> None:
     """Drop the cached tables (tests, or a caller that must see a process started this second)."""
     _tables.clear()
+
+
+def environ_value(pid: int, name: str) -> str | None:
+    """One variable from a process's own environment (sysctl ``KERN_PROCARGS2``), or None. Only ``name`` is kept:
+    the rest of the environment is read past and never stored (2026-11-08: which Claude config folder a process an
+    adopted row points at really runs on)."""
+    import ctypes
+
+    try:
+        libc = ctypes.CDLL("/usr/lib/libSystem.B.dylib", use_errno=True)
+        mib = (ctypes.c_int * 3)(1, 49, int(pid))  # CTL_KERN, KERN_PROCARGS2
+        size = ctypes.c_size_t(0)
+        if libc.sysctl(mib, 3, None, ctypes.byref(size), None, ctypes.c_size_t(0)) != 0 or not size.value:
+            return None
+        buf = ctypes.create_string_buffer(size.value)
+        if libc.sysctl(mib, 3, buf, ctypes.byref(size), None, ctypes.c_size_t(0)) != 0:
+            return None
+    except (OSError, ValueError):
+        return None
+    raw = buf.raw[: size.value]
+    argc = int.from_bytes(raw[:4], "little")
+    parts = raw[4:].split(b"\0")
+    index = 1  # past the executable's path
+    while index < len(parts) and parts[index] == b"":
+        index += 1  # its padding
+    index += argc  # past the arguments
+    prefix = name.encode() + b"="
+    for item in parts[index:]:
+        if item.startswith(prefix):
+            return item[len(prefix):].decode(errors="replace")
+    return None

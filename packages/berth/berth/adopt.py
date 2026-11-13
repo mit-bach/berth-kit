@@ -126,7 +126,9 @@ def build_record(
         "cmux_workspace_id": workspace.id,
         "cmux_surface_id": surface_id,
         "cmux_pid": pid,
-        "attachments": "{}",
+        # The account folder its Claude really runs on (berth/configdir.py ``of_process``), so a reopen keeps it.
+        "attachments": json.dumps({"config_dir": found_dir}) if agent_name == "claude" and (found_dir := _config_dir_of(pid))
+        else "{}",
         "excerpt": "",
         "excerpt_at": None,
         "created_at": stamp,
@@ -134,6 +136,15 @@ def build_record(
         "parked_at": None,
         "played_at": stamp,
     }
+
+
+def _config_dir_of(pid) -> str | None:
+    from berth.configdir import of_process
+
+    try:
+        return of_process(pid)
+    except Exception:  # noqa: BLE001 - an unreadable process is filed on the default, as before
+        return None
 
 
 def adopt_workspace(

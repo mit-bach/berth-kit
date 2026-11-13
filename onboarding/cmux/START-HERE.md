@@ -4,7 +4,7 @@ Paths below are relative to the kit: the repository's top folder.
 
 You are an agent, Claude Code or Grok Build, helping your operator install and start using Berth, the system Dominik built to run many agent sessions at once in cmux. Your operator is new to this way of working: explain every step in plain words before you take it, and show every dry run. Read this file first, all of it.
 
-Kit v3.1.2, built 2026-11-07 (Berth as of 2026-11-07). Tested on macOS 27, Python 3.12, cmux 0.65.2 (0.65 or newer is required), Claude Code 2.1.31x, Grok Build 1.0.67. Your operator's Mac starts empty: no catalog, no sessions, none of Dominik's state.
+Kit v3.2.0, built 2026-11-13 (Berth as of 2026-11-13). Tested on macOS 27, Python 3.12, cmux 0.65.2 (0.65 or newer is required), Claude Code 2.1.31x, Grok Build 1.0.67. Your operator's Mac starts empty: no catalog, no sessions, none of Dominik's state.
 
 ## 0. Why Berth
 
@@ -125,7 +125,7 @@ Walk your operator through `onboarding/cmux/FIRST-DAY.md`, letting them press th
 - After changing Berth's code, a skill, or an MCP server, restart what has it loaded: the watcher (`launchctl kickstart -k gui/$(id -u)/com.bach.berth.watch`), the screen (`q` in it, then ⌘⇧B), and agent sessions (cycle them: `c` in the screen, or the MCP `control` tool). The skills are links into the kit, so an edit is live for the next session.
 - Before a macOS or cmux update: `Z` in the screen (everything sleeps), update, then `W` (everything wakes). After a cmux update, run `berth sidebar install` again, then `python3 tools/doctor.py`.
 - `berth check` says whether Berth matches cmux. `docs/TROUBLESHOOTING.md` covers the rest; `docs/UNINSTALL.md` undoes everything.
-- The tests: `docs/TROUBLESHOOTING.md`, "Run the tests". Expected: Berth 601 passed, 3 failed; cmux-mcp 55 passed.
+- The tests: `docs/TROUBLESHOOTING.md`, "Run the tests". Expected: Berth 607 passed, 3 failed; cmux-mcp 55 passed.
 
 ## 9. What is not in this kit
 

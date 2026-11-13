@@ -95,6 +95,11 @@ def queue(db, berth_id: str, action: str, *, idle: bool = True, force: bool = Fa
         "prompt": None,
     }
     with db.immediate():
+        for old in db.conn.execute("SELECT * FROM deferred WHERE berth_id = ?", (row["id"],)).fetchall():
+            # The one it replaces leaves a trace (2026-11-08: a cycle whose deadline passed while the Mac slept was
+            # replaced by a new request before the watcher woke to log "gave up", and its history just stopped).
+            db.insert_event(row["id"], "deferred_replaced", {"action": old["action"], "until": old["until"],
+                                                             "requested_by": old["requested_by"]})
         db.conn.execute("DELETE FROM deferred WHERE berth_id = ?", (row["id"],))
         db.conn.execute(
             "INSERT INTO deferred (id, berth_id, action, queued_at, not_before, until, force, idle, requested_by, prompt) "
@@ -182,6 +187,14 @@ def run_due(db, cmux, *, now: datetime | None = None, observe_fn=None, pid_alive
         if item["idle"]:
             activity = look(row)
             why = list(activity.reasons)
+            keys = row.keys()
+            flag = row["attention"] if "attention" in keys else None
+            if flag in ("urgent", "follow_up"):
+                # Waiting for Dominik is not idle (2026-11-08, UNI Orch's terms via the Accounts Agent: never move a
+                # session while a question waits for him). An open question in the pane already counted; a raised
+                # flag, with the turn over and the pane at rest, did not.
+                reason = (row["attention_why"] if "attention_why" in keys else "") or ""
+                why.append(f"waiting for Dominik ({flag.replace('_', '-')}{': ' + reason if reason else ''})")
             if activity.draft is not None and not activity.draft.exact:
                 why.append(f"a draft Berth cannot save exactly ({activity.draft.why})")
         if why:

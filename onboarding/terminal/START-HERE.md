@@ -6,7 +6,7 @@ You are a Claude Code agent. Your operator already uses Claude Code. Today they 
 
 Your job is to move your operator from tabs to that setup **over several chats**, at their pace, and to make it theirs, not a copy of Dominik's. Read this file to the end before you act.
 
-Kit v3.1.2, built 2026-11-07 (Berth as of 2026-11-07). Tested on macOS 27, Python 3.12, cmux 0.65.2 (0.65 or newer is required), Claude Code 2.1.31x.
+Kit v3.2.0, built 2026-11-13 (Berth as of 2026-11-13). Tested on macOS 27, Python 3.12, cmux 0.65.2 (0.65 or newer is required), Claude Code 2.1.31x.
 
 ## 1. What your operator gets
 
@@ -87,6 +87,6 @@ Dominik's own docs inside `packages/` and `skills/` sometimes say where things l
 
 1. Check the version: `git -C <kit> describe --tags`, and tell the operator.
 2. The kit is the repository's top folder, two levels above this file. It must live somewhere permanent, because everything installed runs from it. If it is in Downloads, Desktop, Documents, an iCloud folder, or `/tmp`, ask the operator where it should live (`~/berth-kit` is a good default) and move it before stage 1. Record its absolute path in `PROGRESS.md`.
-3. Optional, and a good habit: run the tests in a throwaway virtualenv (`docs/TROUBLESHOOTING.md` → "Run the tests"). Expected: Berth 601 passed, 3 failed; cmux-mcp 55 passed. The 3 known failures are older than this kit and harmless (`docs/OPEN-ITEMS.md`).
+3. Optional, and a good habit: run the tests in a throwaway virtualenv (`docs/TROUBLESHOOTING.md` → "Run the tests"). Expected: Berth 607 passed, 3 failed; cmux-mcp 55 passed. The 3 known failures are older than this kit and harmless (`docs/OPEN-ITEMS.md`).
 
 Then open `onboarding/terminal/stages/0-survey.md`.

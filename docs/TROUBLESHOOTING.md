@@ -41,7 +41,7 @@ python3.12 -m venv /tmp/berth-test-venv      # or: uv venv --python 3.12 /tmp/be
 (cd packages/cmux-mcp && BERTH_ROOT="$PWD/../berth" /tmp/berth-test-venv/bin/python -m pytest -q -o addopts= tests)
 ```
 
-`-o addopts=` matters: Berth's `pyproject.toml` already passes `-q`, and a second one hides the summary line. Expected: Berth 601 passed, 3 failed; cmux-mcp 55 passed. The tests never touch the real catalog, cmux, the clipboard, or `~/.claude`. Use a throwaway virtualenv as above, or the installed one (`packages/berth/.venv`).
+`-o addopts=` matters: Berth's `pyproject.toml` already passes `-q`, and a second one hides the summary line. Expected: Berth 607 passed, 3 failed; cmux-mcp 55 passed. The tests never touch the real catalog, cmux, the clipboard, or `~/.claude`. Use a throwaway virtualenv as above, or the installed one (`packages/berth/.venv`).
 
 ## After changing code, a skill, or an MCP server
 

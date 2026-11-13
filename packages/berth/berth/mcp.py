@@ -1065,16 +1065,29 @@ class Api:
             record = adopt_appearing(db, self.cmux, load_hooks, created.id, wait_s=self.adopt_wait)
             if record is None:
                 raise ToolError("CMUX_REJECTED", "cmux opened the workspace but Berth could not file it", {"workspace": created.id})
-            move_berth(db, record["id"], folder)
+            # The session exists from here on: a step that fails now is a warning in the result, never an error, so
+            # no caller takes it for "not created" and starts a second one (2026-11-10, UNI Orch: create answered
+            # KIND_UNSAFE for a Claude it had started and prompted).
+            warnings = []
+            try:
+                move_berth(db, record["id"], folder)
+            except BerthError as exc:
+                warnings.append(f"not filed in {folder}: {exc.message}")
             if config_dir is not None:
                 from berth.configdir import set_config_dir
 
-                set_config_dir(db, record["id"], config_dir, by=view.caller.title if view.caller is not None else "")
+                try:
+                    set_config_dir(db, record["id"], config_dir, by=view.caller.title if view.caller is not None else "",
+                                   spawned_claude=agent == "claude")
+                except BerthError as exc:
+                    warnings.append(f"its config folder is not recorded: {exc.message}")
             with contextlib.suppress(Exception):
                 paint_berth(db, self.cmux, record["id"])
             brief = self._brief(db, record["id"], agent=agent, cwd=str(cwd))
             if config_dir is not None:
                 brief["config_dir"] = config_dir
+            if warnings:
+                brief["warnings"] = warnings
             return brief
         finally:
             db.close()

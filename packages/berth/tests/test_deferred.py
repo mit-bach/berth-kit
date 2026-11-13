@@ -218,3 +218,46 @@ def test_a_cycle_whose_watcher_stopped_after_the_close_reopens_the_session(catal
     outcome = run_due(catalog, cmux, now=_later(0.1), observe_fn=lambda row: IDLE)
     assert outcome == [{"id": "sync", "result": "done", "resumed": True}]
     assert catalog.require_berth("sync")["state"] == "live" and pending(catalog) == []
+
+
+def test_a_new_request_records_the_one_it_replaces(catalog):
+    """2026-11-08: a cycle whose deadline passed while the Mac slept was replaced before the watcher could log it."""
+    cmux = FakeCmux()
+    _live(catalog, cmux, "fork")
+    api = Api(catalog.path, cmux=cmux, caller_workspace=None)
+    api("control", {"action": "cycle", "sessions": "fork", "when": "idle"})
+    api("control", {"action": "sleep", "sessions": "fork", "when": "idle"})
+    assert [item["action"] for item in pending(catalog)] == ["sleep"]
+    assert _events(catalog, "fork")[-2:] == ["deferred_replaced", "deferred_queued"]
+
+
+def test_an_idle_close_waits_while_the_session_waits_for_dominik(catalog):
+    """2026-11-08: Belief Engineer's turn was over with a follow-up up; its idle cycle would have moved it anyway."""
+    cmux = FakeCmux()
+    _live(catalog, cmux, "engineer")
+    with catalog.immediate():
+        catalog.conn.execute("UPDATE berth SET attention = 'follow_up', attention_why = 'approve the plan' "
+                             "WHERE id = 'engineer'")
+    Api(catalog.path, cmux=cmux, caller_workspace=None)("control", {"action": "cycle", "sessions": "engineer",
+                                                                     "when": "idle"})
+    assert run_due(catalog, cmux, now=_later(0.1), observe_fn=lambda row: IDLE) == []  # waits; not cycled
+    assert cmux.closed == []
+    outcome = run_due(catalog, cmux, now=_later(61), observe_fn=lambda row: IDLE)
+    assert outcome[0]["result"] == "gave up" and "waiting for Dominik (follow-up: approve the plan)" in outcome[0]["why"]
+
+
+def test_berth_cancel_takes_back_a_queued_close_from_the_command_line(catalog, capsys):
+    import json
+
+    from berth.cli import main
+
+    cmux = FakeCmux()
+    _live(catalog, cmux, "engineer")
+    Api(catalog.path, cmux=cmux, caller_workspace=None)("control", {"action": "cycle", "sessions": "engineer",
+                                                                     "when": "idle"})
+    assert main(["--catalog", str(catalog.path), "--json", "cancel", "engineer"]) == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["cancelled"]["action"] == "cycle" and pending(catalog) == []
+    assert "deferred_cancelled" in _events(catalog, "engineer")
+    assert main(["--catalog", str(catalog.path), "--json", "cancel", "engineer"]) == 0
+    assert json.loads(capsys.readouterr().out)["cancelled"] is None  # nothing queued: says so, changes nothing
